@@ -1,0 +1,10 @@
+version: '2'
+services:
+  www:
+    build: .
+    ports:
+      - '8001:80'
+      - '9000:9000'
+    volumes:
+      - .:/var/www/html/
+    

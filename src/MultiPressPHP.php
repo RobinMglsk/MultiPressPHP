@@ -1,14 +1,4 @@
 <?php
-/**
- * MultiPress RESTAPI
- *
- * PHP class for Multipress API
- *
- * @author Robin Migalski <robin@migalski.be>
- * @copyright 2016 Egberghs Printing Service NV
- * @link http://www.egberghs.be
- * @version 1.0.0
- */
 
 /**
  * Multipress RESTAPI
@@ -20,7 +10,7 @@
  * @link http://www.egberghs.be
  * @version 1.0.0
  */
-class MultiPress {
+class MultiPressPHP {
 
 	protected $url = null;
 	protected $port = null;
@@ -30,8 +20,8 @@ class MultiPress {
 	private $password = null;
 	private $headers = null;
 
-	public $system_info = array();
-	public $INT_BUFFER = array(
+	public $system_info = [];
+	public $INT_BUFFER = [
 		'type' => 2,
 		'checklist' => 1,
 		'standard_quotation' => 0,
@@ -76,7 +66,7 @@ class MultiPress {
 		'price' => "0",
 		'language_code' => "nl",
 		'invoice_number' => null,
-		'invoice_address' => "Standaard Boekhandel nv",
+		'invoice_address' => "",
 		'invoice_company' => "",
 		'remark' => "",
 		'files' => false,
@@ -84,7 +74,7 @@ class MultiPress {
 		'payment_remark' => "",
 		'product_type' => "Copie_school",
 		'product_number' => 101,
-		'delivery' => array(
+		'delivery' => [
 			"company" => "",
 			"branch" => "",
 			"address" => "",
@@ -96,9 +86,9 @@ class MultiPress {
 			"phone" => "",
 			"remark" => "",
 			"email" => ""
-		),
+		],
 		'reference' => "",
-		'autofill' => array(
+		'autofill' => [
 		  	'pdflink' =>  2,
 			'modelheight' => 297,
 			'modelwidth' => 210,
@@ -113,8 +103,8 @@ class MultiPress {
 			'production' => "Printen",
 			'bindingtype' => "",
 			'finishing' => ""
-		)
-	);
+		]
+	];
 
 	/**
 	 * __construct
@@ -127,7 +117,8 @@ class MultiPress {
 	 * @param bool $ssl Ssl encryption on or off.
 	 * @return True if successful
 	 */
-	public function __construct($user,$password,$url,$port,$ssl=false) {
+	public function __construct($user,$password,$url,$port,$ssl=false)
+	{
        	$this->url = $url;
        	$this->port = $port;
 
@@ -169,13 +160,14 @@ class MultiPress {
 	 * @param array $job_details Details of job like defined in $INT_BUFFER.
 	 * @return True if successful
 	 */
-   	public function fill_internet_buffer($job_details){
+	public function fill_internet_buffer($job_details)
+	{
    		foreach ($job_details as $key => $value) {
-   			if(isset($this->INT_BUFFER[$key])){
+   			if(array_key_exists($key, $this->INT_BUFFER)){
 
    				//DATE
    				if( $key == "delivery_date" || $key == "artwork_date" ){
-   					$value = date("Y-m-d\TH:i:s\Z",strtotime($value));
+   					$value = self::convertToDate(strtotime($value));
    				}
 
    				//AUTOFILL
@@ -227,7 +219,8 @@ class MultiPress {
 	 * Write internet buffer to Multipress as an order.
 	 * @return True if successful
 	 */
-   	public function internet_order_add(){
+	   public function internet_order_add()
+	   {
 
    		$fields = array(
 		  'data' => json_encode($this->INT_BUFFER,JSON_UNESCAPED_UNICODE),
@@ -248,8 +241,7 @@ class MultiPress {
 		if(isset($r['errornumber'])){
 			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
-			$this->last_internet_id = $r['id'];
-			return true;
+			return $this->last_internet_id = $r['id'];
 		}
 
    	}
@@ -261,7 +253,8 @@ class MultiPress {
 	 * @param int $id Id of order in webbuffer.
 	 * @return True if successful
 	 */
-   	public function internet_order_update($id){
+	   public function internet_order_update($id)
+	   {
 
    		$fields = array(
 		  'data' => json_encode($this->INT_BUFFER,JSON_UNESCAPED_UNICODE),
@@ -282,8 +275,7 @@ class MultiPress {
 		if(isset($r['errornumber'])){
 			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
-			$this->last_internet_id = $r['id'];
-			return true;
+			return $this->last_internet_id = $r['id'];
 		}
 
    	}
@@ -293,9 +285,10 @@ class MultiPress {
 	 *
 	 * Delete order line from the internet buffer in multipress.
 	 * @param int $id Id of order in webbuffer.
-	 * @return True if successful
+	 * @return Bool if successful
 	 */
-   	public function internet_order_remove($id){
+	   public function internet_order_remove($id)
+	   {
 
 
    		$fields = array(
@@ -329,7 +322,8 @@ class MultiPress {
 	 * @param int $relation_id Relation id.
 	 * @return Array with orders
 	 */
-   	public function internet_get_orders($relation_id){
+	   public function internet_get_orders($relation_id)
+	   {
 
    		$curl = curl_init();
 
@@ -351,13 +345,13 @@ class MultiPress {
    	/**
 	 * get_autoFillAttributes
 	 *
-	 * Get order from relation
-	 * @param int $relation_id Relation id.
+	 * Get the autofill attributes
 	 * @return Array with autoFillAttributes
 	 */
-   	public function get_autoFillAttributes(){
+	public function get_auto_fill_attributes()
+	{
 
-   		$curl = curl_init();
+		$curl = curl_init();
 
 		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/internet/autoFillAttributes");
 		curl_setopt($curl,CURLOPT_PORT,$this->port);
@@ -372,7 +366,100 @@ class MultiPress {
 			return $r;
 		}
 
-   	}
+	}
+
+	/**
+	 * get_product_type
+	 *
+	 * Get product types
+	 * @return Array with product types
+	 */
+	public function get_product_types()
+	{
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/system/getProductTypes");
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r['product_types'];
+		}
+
+	}
+
+
+	/**
+	 * get_relation_list
+	 *
+	 * Get a list of relations
+	 * @param int $relation_code Relation code: K = Client, L = Supplier, O = Old client, As defined in pulldownlist number 22.
+	 * @return Array with relations
+	 */
+	public function get_relation_list($relation_code = 'K')
+	{
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/relations/getRelationsList?relation_code=".$relation_code);
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r['relations'];
+		}
+
+	}
+
+	/**
+	 * get_relation_details
+	 *
+	 * Get a list of relations
+	 * @param int $relation_number Relation number
+	 * @param String $details - valid options: brief, full, contact, delivery, financial, pricelist, products, partnership
+	 * @return Array with relations
+	 */
+	public function get_relation_details($relation_number, $details = 'brief')
+	{
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/relations/getRelationInfo?relation_number=".$relation_number."&details=".$details);
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r;
+		}
+
+	}
+
+	/**
+	 * Convert date to multipress date
+	 * 
+	 * @param Int time in seconds
+	 * @return String date
+	 */
+	public static function convertToDate($time)
+	{
+		return substr(date('c', $time), 0, 19);
+	}
 }
 
 ?>
