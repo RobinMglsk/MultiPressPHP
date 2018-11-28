@@ -10,7 +10,7 @@ if(isset($_GET['exec']) && $_GET['exec'] == 1){
     $mp = new MultiPressPHP($secrets['user'], $secrets['password'], $secrets['host'], $secrets['port'], false);
 
     $product_types  = $mp->get_product_types();
-	$relation_details = $mp->get_relation_details($_GET['relation']);
+	$relation_details = $mp->relation_details($_GET['relation']);
 
 	if(isset($_GET['paper'])){
 		$paper_details = $mp->get_paper_by_id($_GET['paper']);
@@ -112,7 +112,7 @@ if(isset($_GET['exec']) && $_GET['exec'] == 1){
     $mp = new MultiPressPHP($secrets['user'], $secrets['password'], $secrets['host'], $secrets['port'], false);
     
     $product_types  = $mp->get_product_types();
-    $relations  = $mp->get_relation_list();
+    $relations  = $mp->relation_list();
 	$auto_fill_attributes  = $mp->get_auto_fill_attributes();
 	$paper_list = $mp->get_paper();
 
