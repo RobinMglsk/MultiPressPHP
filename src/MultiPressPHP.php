@@ -322,8 +322,8 @@ class MultiPressPHP {
 	 * @param int $relation_id Relation id.
 	 * @return Array with orders
 	 */
-	   public function internet_get_orders($relation_id)
-	   {
+	public function internet_get_orders($relation_id)
+	{
 
    		$curl = curl_init();
 
@@ -340,7 +340,115 @@ class MultiPressPHP {
 			return $r;
 		}
 
-   	}
+	}
+	   
+	/**
+	 * Get planning
+	 * 
+ 	 * @param Int $start_time
+	 * @param Int $end_time
+	 * @param Int $department_id The id of the department default: 2 = digital
+	 * @return Array with plinning items
+	 * @license Connector (basic)
+	 */
+	public function planning_get_lines($start_time = null, $end_time = null, $department_id = 2)
+	{
+
+		$start_time = $start_time === null ? self::convertToDate( strtotime('today') ) : self::convertToDate($start_time);
+		$end_time = $end_time === null ? self::convertToDate( strtotime('tommorow') ) : self::convertToDate($end_time);
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/planning/getLines?startdate=".$start_time."&stopdate=".$end_time."&department=".$department_id);
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r;
+		}
+	}
+
+	/**
+	 * Get planning item details
+	 * 
+ 	 * @param Int $id The id of the planning item
+	 * @return Array with planning item details
+	 * @license Connector (basic)
+	 */
+	public function planning_get_details($id)
+	{
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/planning/getLines?id=".$id);
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r;
+		}
+	}
+
+	/**
+	 * Get employee list
+	 * 
+	 * @return Array with employees
+	 * @license Connector (basic)
+	 */
+	public function employee_list()
+	{
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/employees/getEmployeesList");
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r['employees'];
+		}
+	}
+
+	/**
+	 * Get employee list
+	 * 
+ 	 * @param Int $id The id of the employee
+	 * @return Array with details for the employee
+	 * @license Connector (basic)
+	 */
+	public function employee_details($id)
+	{
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/employees/getEmployeeInfo?employee_number=".$id);
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r;
+		}
+	}
 
    	/**
 	 * get_autoFillAttributes
@@ -503,6 +611,17 @@ class MultiPressPHP {
 	public static function convertToDate($time)
 	{
 		return substr(date('c', $time), 0, 19);
+	}
+
+	/**
+	 * Convert decimal time to seconds
+	 * 
+	 * @param Int $time decimal time
+	 * @return Int Seconds
+	 */
+	public static function convertToTime($time)
+	{
+		return (60*$time)*60;
 	}
 }
 

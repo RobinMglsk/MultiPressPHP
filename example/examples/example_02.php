@@ -3,17 +3,8 @@
 require_once('../../src/MultiPressPHP.php');
 $secrets = (include '../secret.php');
 
-if(isset($_GET['exec']) && $_GET['exec'] == 1){
-
-   
-
-
-}else{
-
-    $mp = new MultiPressPHP($secrets['user'], $secrets['password'], $secrets['host'], $secrets['port'], false);
-    $paperName  = $mp->get_paper_by_id(1867);
-
-}
+$mp = new MultiPressPHP($secrets['user'], $secrets['password'], $secrets['host'], $secrets['port'], false);
+$paperName  = $mp->get_paper_by_id(1867);
 
 ?>
 

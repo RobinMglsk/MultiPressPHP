@@ -156,7 +156,7 @@ if(isset($_GET['exec']) && $_GET['exec'] == 1){
                 <label for="description">Description</label>
                 <textarea class="u-full-width" id="description" name="description"><?= $response ?></textarea>
 
-                <label for="relation">Product type</label>
+                <label for="product_type">Product type</label>
                 <select class="u-full-width" id="product_type" name="product_type" required>
                     <option value=""></option>
                     <?php foreach($product_types as $key => $product_type): ?>
@@ -164,7 +164,7 @@ if(isset($_GET['exec']) && $_GET['exec'] == 1){
                     <?php endforeach; ?>
                 </select>
 
-				<label for="relation">Paper</label>
+				<label for="paper">Paper</label>
                 <select class="u-full-width" id="paper" name="paper" required>
                     <option value=""></option>
                     <?php foreach($paper_list as $key => $paper): ?>
