@@ -506,6 +506,63 @@ class MultiPressPHP {
 	}
 
 	/**
+	 * Get job details
+	 * 
+ 	 * @param Int $id The id of the job
+	 * @return Array with job details
+	 * @license Connector (basic)
+	 */
+	public function job_details($id)
+	{
+
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/jobs/getPostCalculation?job_number=".$id);
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r;
+		}
+	}
+
+	/**
+	 * Get job order history
+	 * 
+ 	 * @param Int $id The id of the job
+	 * @return Array with order history
+	 * @license Connector (basic)
+	 */
+	public function job_order_history($id)
+	{
+		$history = [];
+
+		$details = $this->job_details($id);
+		$historyRaw = explode("\r",$details['job_status_history']);
+
+		foreach($historyRaw as $item){
+
+			
+
+			array_push($history, [
+				'time' => strtotime(str_replace('/','-',substr($item,0,16))),
+				'msg' => trim(explode("    ",substr($item,16))[0],' :'),
+				'by' => trim(end(explode("    ",substr($item,16))),' :'),
+			]);
+			
+		}
+
+		return $history;
+	}
+
+	
+	/**
 	 * get_relation_list
 	 *
 	 * Get a list of relations
