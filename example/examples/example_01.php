@@ -10,7 +10,14 @@ if(isset($_GET['exec']) && $_GET['exec'] == 1){
     $mp = new MultiPressPHP($secrets['user'], $secrets['password'], $secrets['host'], $secrets['port'], false);
 
     $product_types  = $mp->get_product_types();
-    $relation_details = $mp->get_relation_details($_GET['relation']);
+	$relation_details = $mp->get_relation_details($_GET['relation']);
+
+	if(isset($_GET['paper'])){
+		$paper_details = $mp->get_paper_by_id($_GET['paper']);
+		$paper = $paper_details['name'];
+	}else{
+		$paper = 'condat silk wit 130 g/m²';
+	}
 
     $mp->fill_internet_buffer([
 		'type' => 2,
@@ -85,8 +92,8 @@ if(isset($_GET['exec']) && $_GET['exec'] == 1){
 			'modelwidth' => 210,
 			'pagesbody' => 8, //Pages total not body!
 			'pagescover' => 0,
-			'paperbody' => "condat silk wit 130 g/m²",
-			'papercover' => "condat silk wit 300 g/m²",
+			'paperbody' => $paper,
+			'papercover' => $paper,
 			'colorbody' => "Recto: Cyaan; Magenta; Geel; Zwart\rVerso: Cyaan; Magenta; Geel; Zwart\r",
 			'colorcover' => "Recto: Cyaan; Magenta; Geel; Zwart\rVerso: Cyaan; Magenta; Geel; Zwart\r",
 			'bleed' => 3,
@@ -106,8 +113,9 @@ if(isset($_GET['exec']) && $_GET['exec'] == 1){
     
     $product_types  = $mp->get_product_types();
     $relations  = $mp->get_relation_list();
-    $auto_fill_attributes  = $mp->get_auto_fill_attributes();
-    var_dump($auto_fill_attributes[0]);
+	$auto_fill_attributes  = $mp->get_auto_fill_attributes();
+	$paper_list = $mp->get_paper();
+
     usort($relations, function($a, $b){
         return strcmp(strtoupper($a['company']), strtoupper($b['company']));
     });
@@ -153,6 +161,14 @@ if(isset($_GET['exec']) && $_GET['exec'] == 1){
                     <option value=""></option>
                     <?php foreach($product_types as $key => $product_type): ?>
                         <option value="<?= $key ?>"><?= $product_type['product_type'] ?></option>
+                    <?php endforeach; ?>
+                </select>
+
+				<label for="relation">Paper</label>
+                <select class="u-full-width" id="paper" name="paper" required>
+                    <option value=""></option>
+                    <?php foreach($paper_list as $key => $paper): ?>
+                        <option value="<?= $key ?>"><?= $paper['description'] ?></option>
                     <?php endforeach; ?>
                 </select>
 

@@ -451,6 +451,50 @@ class MultiPressPHP {
 	}
 
 	/**
+	 * Get paper
+	 * 
+	 * @return Array list of alle paper
+	 * @license Connector (basic)
+	 */
+	public function get_paper()
+	{
+		$paperList = [];
+		$autoFillAttributes = $this->get_auto_fill_attributes();
+
+		foreach($autoFillAttributes as $type){
+			foreach($type['paper'] as $paper){
+				if(!array_key_exists($paper['id'], $paperList)){
+					$paperList[$paper['id']] = [
+						'name' => $paper['name'],
+						'description' => $paper['description'],
+						'roll' => $paper['roll'],
+						'width' => $paper['width'],
+						'length' => $paper['length'],
+						'type' => $paper['type'],
+						'weight' => $paper['weight']
+					];
+				}
+			}
+		}
+
+		return $paperList;
+
+	}
+
+	/**
+	 * Get paper by id
+	 * 
+	 * @param Int $id The id of the paper
+	 * @return Array attributes of the paper
+	 * @license Connector (basic)
+	 */
+	public function get_paper_by_id($id)
+	{
+		$paperList = $this->get_paper();
+		return array_key_exists($id, $paperList) ? $paperList[$id] : false;
+	}
+
+	/**
 	 * Convert date to multipress date
 	 * 
 	 * @param Int time in seconds
