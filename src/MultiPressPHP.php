@@ -425,7 +425,7 @@ class MultiPressPHP {
 	}
 
 	/**
-	 * Get employee list
+	 * Get employee details
 	 * 
  	 * @param Int $id The id of the employee
 	 * @return Array with details for the employee
@@ -448,6 +448,116 @@ class MultiPressPHP {
 		}else{
 			return $r;
 		}
+	}
+
+	/**
+	 * Get employee operations
+	 * 
+ 	 * @param Int $id The id of the employee
+	 * @return Array with operations linked to the employee
+	 * @license Connector (basic)
+	 */
+	public function employee_operations($id)
+	{
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/employees/handleOperations?employee_number=".$id);
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r['operations'];
+		}
+	}
+
+	/**
+	 * Get employee worksheets
+	 * 
+ 	 * @param Int $id The id of the employee
+ 	 * @param Int $date The date in seconds
+	 * @return Array with operations linked to the employee
+	 * @license Connector (basic)
+	 */
+	public function employee_worksheets($id, $date = null)
+	{
+
+		$date = $date === null ? self::convertToDate( strtotime('today') ) : self::convertToDate($date);
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/employees/handleWorkSheets?employee_number=".$id."&date=".$date);
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r;
+		}
+	}
+
+	/**
+	 * get_relation_list
+	 *
+	 * Get a list of relations
+	 * @param int $relation_code Relation code: K = Client, L = Supplier, O = Old client, As defined in pulldownlist number 22.
+	 * @return Array with relations
+	 */
+	public function relation_list($relation_code = 'K')
+	{
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/relations/getRelationsList?relation_code=".$relation_code);
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r['relations'];
+		}
+
+	}
+
+	/**
+	 * get_relation_details
+	 *
+	 * Get a list of relations
+	 * @param int $relation_number Relation number
+	 * @param String $details - valid options: brief, full, contact, delivery, financial, pricelist, products, partnership
+	 * @return Array with relations
+	 */
+	public function relation_details($relation_number, $details = 'brief')
+	{
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/relations/getRelationInfo?relation_number=".$relation_number."&details=".$details);
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r;
+		}
+
 	}
 
    	/**
@@ -502,62 +612,6 @@ class MultiPressPHP {
 
 	}
 
-
-	/**
-	 * get_relation_list
-	 *
-	 * Get a list of relations
-	 * @param int $relation_code Relation code: K = Client, L = Supplier, O = Old client, As defined in pulldownlist number 22.
-	 * @return Array with relations
-	 */
-	public function get_relation_list($relation_code = 'K')
-	{
-
-		$curl = curl_init();
-
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/relations/getRelationsList?relation_code=".$relation_code);
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
-
-		$r = json_decode(curl_exec($curl),true);
-
-		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
-			return $r['relations'];
-		}
-
-	}
-
-	/**
-	 * get_relation_details
-	 *
-	 * Get a list of relations
-	 * @param int $relation_number Relation number
-	 * @param String $details - valid options: brief, full, contact, delivery, financial, pricelist, products, partnership
-	 * @return Array with relations
-	 */
-	public function get_relation_details($relation_number, $details = 'brief')
-	{
-
-		$curl = curl_init();
-
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/relations/getRelationInfo?relation_number=".$relation_number."&details=".$details);
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
-
-		$r = json_decode(curl_exec($curl),true);
-
-		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
-			return $r;
-		}
-
-	}
-
 	/**
 	 * Get paper
 	 * 
@@ -600,6 +654,32 @@ class MultiPressPHP {
 	{
 		$paperList = $this->get_paper();
 		return array_key_exists($id, $paperList) ? $paperList[$id] : false;
+	}
+
+	/**
+	 * get_operations_list
+	 *
+	 * Get operations
+	 * @return Array with operations types
+	 */
+	public function get_operations_list()
+	{
+
+		$curl = curl_init();
+
+		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/employees/getOperationsList");
+		curl_setopt($curl,CURLOPT_PORT,$this->port);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+
+		$r = json_decode(curl_exec($curl),true);
+
+		if(isset($r['errornumber'])){
+			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+		}else{
+			return $r['operations'];
+		}
+
 	}
 
 	/**
