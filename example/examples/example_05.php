@@ -10,7 +10,15 @@ $employees  = $mp->employee_list();
 
 if(isset($_GET['exec'])){
     $mp = new MultiPressPHP($secrets['user'], $secrets['password'], $secrets['host'], $secrets['port'], false);
-    $worksheets  = $mp->employee_worksheets($_GET['employee']);
+    
+    $date = null;
+    if(isset($_GET['date'])){
+        if(!$date = strtotime($_GET['date'])){
+            $date = null;
+        }
+    }
+
+    $worksheets  = $mp->employee_worksheets($_GET['employee'], $date);
 }
 
 
@@ -25,6 +33,18 @@ if(isset($_GET['exec'])){
     <title>MultiPressPHP - Examples</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.css" />
+    <style>
+        input[type="datetime-local"]{
+            height: 38px;
+            padding: 6px 10px;
+            background-color: #fff;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            box-shadow: none;
+            box-sizing: border-box;
+            font: 400 11px system-ui;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -59,8 +79,8 @@ if(isset($_GET['exec'])){
         <?php else: ?>
             <form action="" method="get">
 
-                <label for="employee">Date</label>
-                <input class="u-full-width" type="text" value="<?= MultiPressPHP::convertToDate(strtotime('today')) ?>" disabled>
+                <label for="date">Date</label>
+                <input class="u-full-width" type="datetime-local" name="date" id="date" value="<?= MultiPressPHP::convertToDate(strtotime('today')) ?>">
 
                 <label for="employee">Employee</label>
                 <select class="u-full-width" id="employee" name="employee" required>
