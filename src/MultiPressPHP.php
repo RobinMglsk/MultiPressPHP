@@ -675,13 +675,37 @@ class MultiPressPHP {
 	 * @return Array list of alle paper
 	 * @license Connector (basic)
 	 */
-	public function get_paper()
+	public function get_paper($pdfLink = null)
 	{
 		$paperList = [];
 		$autoFillAttributes = $this->get_auto_fill_attributes();
 
-		foreach($autoFillAttributes as $type){
-			foreach($type['paper'] as $paper){
+		if($pdfLink === null){
+			foreach($autoFillAttributes as $type){
+				foreach($type['paper'] as $paper){
+					if(!array_key_exists($paper['id'], $paperList)){
+						$paperList[$paper['id']] = [
+							'name' => $paper['name'],
+							'description' => $paper['description'],
+							'roll' => $paper['roll'],
+							'width' => $paper['width'],
+							'length' => $paper['length'],
+							'type' => $paper['type'],
+							'weight' => $paper['weight']
+						];
+					}
+				}
+			}
+		}else{
+
+			$selectedType = null;
+			foreach($autoFillAttributes as $type){
+				if($type['id'] == $pdfLink) $selectedType =$type;
+			}
+
+			if(is_null($selectedType)) throw new Exception('PdfLink not found');
+
+			foreach($selectedType['paper'] as $paper){
 				if(!array_key_exists($paper['id'], $paperList)){
 					$paperList[$paper['id']] = [
 						'name' => $paper['name'],
