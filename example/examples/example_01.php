@@ -14,7 +14,7 @@ if(isset($_GET['exec']) && $_GET['exec'] == 1){
 
 	if(isset($_GET['paper'])){
 		$paper_details = $mp->get_paper_by_id($_GET['paper']);
-		$paper = $paper_details['name'];
+		$paper = $paper_details['description'];
 	}else{
 		$paper = 'condat silk wit 130 g/m²';
 	}
@@ -114,7 +114,7 @@ if(isset($_GET['exec']) && $_GET['exec'] == 1){
     $product_types  = $mp->get_product_types();
     $relations  = $mp->relation_list();
 	$auto_fill_attributes  = $mp->get_auto_fill_attributes();
-	$paper_list = $mp->get_paper();
+	$paper_list = $mp->get_paper(2);
 
     usort($relations, function($a, $b){
         return strcmp(strtoupper($a['company']), strtoupper($b['company']));
