@@ -1,5 +1,7 @@
 <?php
 
+namespace RobinMglsk;
+
 /**
  * Multipress RESTAPI
  *

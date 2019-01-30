@@ -1,6 +1,6 @@
 <?php
 
-require_once('../../src/MultiPressPHP.php');
+require_once('../../src/MultiPressPHP/MultiPressPHP.php');
 $secrets = (include '../secret.php');
 
 $mp = new MultiPressPHP($secrets['user'], $secrets['password'], $secrets['host'], $secrets['port'], false);

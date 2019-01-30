@@ -1,6 +1,6 @@
 <?php
 
-require_once('../../src/MultiPressPHP.php');
+require_once('../../src/MultiPressPHP/MultiPressPHP.php');
 $secrets = (include '../secret.php');
 
 if(isset($_GET['exec']) && $_GET['exec'] == 1){
