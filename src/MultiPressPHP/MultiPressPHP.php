@@ -2,6 +2,8 @@
 
 namespace RobinMglsk;
 
+use Exceptions;
+
 /**
  * Multipress RESTAPI
  *
