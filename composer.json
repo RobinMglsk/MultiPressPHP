@@ -1,4 +1,23 @@
 {
-  "name":"RobinMglsk/MultiPressPHP",
-  "description":"Multipress api wrapper"
+  "name": "RobinMglsk/MultiPressPHP",
+  "description": "Multipress api wrapper",
+  "type": "library",
+  "keywords": [
+    "multipress",
+    "dataline",
+    "mp",
+    "egberghs"
+  ],
+  "homepage": "https://github.com/RobinMglsk/MultiPressPHP",
+  "require": {
+    "php": "^5.4 || ^7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "RobinMglsk\\MultiPressPHP\\": "src/"
+    }
+  },
+  "replace": {
+    "RobinMglsk/MultiPressPHP": "self.version"
+  }
 }
