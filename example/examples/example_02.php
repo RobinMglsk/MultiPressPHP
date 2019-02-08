@@ -1,5 +1,7 @@
 <?php
 
+use RobinMglsk\MultiPressPHP;
+
 require_once('../../src/MultiPressPHP/MultiPressPHP.php');
 $secrets = (include '../secret.php');
 
