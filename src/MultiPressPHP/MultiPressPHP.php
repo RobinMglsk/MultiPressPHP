@@ -153,7 +153,7 @@ class MultiPressPHP {
 			$this->system_info = $r;
 			return true;
 		}else{
-			throw new Exception('Can not connect to Multipress server.');
+			throw new \Exception('Can not connect to Multipress server.');
 		}
    	}
 
@@ -187,7 +187,7 @@ class MultiPressPHP {
 
    							}else{
 
-								throw new Exception($k1.' is not a valid autofill-option');
+								throw new \Exception($k1.' is not a valid autofill-option');
 
    							}
 
@@ -197,7 +197,7 @@ class MultiPressPHP {
 
    					}else{
 
-   						throw new Exception($key.' has to be an array');
+   						throw new \Exception($key.' has to be an array');
 
    					}
 
@@ -207,7 +207,7 @@ class MultiPressPHP {
 
    			}else{
 
-				throw new Exception($key.' is not a valid job-option');
+				throw new \Exception($key.' is not a valid job-option');
 
    			}
 
@@ -243,7 +243,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $this->last_internet_id = $r['id'];
 		}
@@ -277,7 +277,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $this->last_internet_id = $r['id'];
 		}
@@ -311,7 +311,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			$this->last_internet_id = $r['id'];
 			return true;
@@ -339,7 +339,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r;
 		}
@@ -371,7 +371,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r;
 		}
@@ -397,7 +397,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r;
 		}
@@ -422,7 +422,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r['employees'];
 		}
@@ -448,7 +448,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r;
 		}
@@ -474,7 +474,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r['operations'];
 		}
@@ -503,7 +503,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r;
 		}
@@ -530,7 +530,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r;
 		}
@@ -585,7 +585,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r['relations'];
 		}
@@ -613,7 +613,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r;
 		}
@@ -638,7 +638,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r;
 		}
@@ -664,7 +664,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r['product_types'];
 		}
@@ -705,7 +705,7 @@ class MultiPressPHP {
 				if($type['id'] == $pdfLink) $selectedType =$type;
 			}
 
-			if(is_null($selectedType)) throw new Exception('PdfLink not found');
+			if(is_null($selectedType)) throw new \Exception('PdfLink not found');
 
 			foreach($selectedType['paper'] as $paper){
 				if(!array_key_exists($paper['id'], $paperList)){
@@ -758,7 +758,7 @@ class MultiPressPHP {
 		$r = json_decode(curl_exec($curl),true);
 
 		if(isset($r['errornumber'])){
-			throw new Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
+			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
 		}else{
 			return $r['operations'];
 		}
