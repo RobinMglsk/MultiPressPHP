@@ -221,7 +221,7 @@ class MultiPressPHP {
 	 * internet_order_add
 	 *
 	 * Write internet buffer to Multipress as an order.
-	 * @return True if successful
+	 * @return bool True if successful
 	 */
 	   public function internet_order_add()
 	   {
@@ -255,7 +255,7 @@ class MultiPressPHP {
 	 *
 	 * Update order in internet buffer.
 	 * @param int $id Id of order in webbuffer.
-	 * @return True if successful
+	 * @return bool True if successful
 	 */
 	   public function internet_order_update($id)
 	   {
@@ -289,7 +289,7 @@ class MultiPressPHP {
 	 *
 	 * Delete order line from the internet buffer in multipress.
 	 * @param int $id Id of order in webbuffer.
-	 * @return Bool if successful
+	 * @return bool True if successful
 	 */
 	   public function internet_order_remove($id)
 	   {
@@ -324,7 +324,7 @@ class MultiPressPHP {
 	 *
 	 * Get order from relation
 	 * @param int $relation_id Relation id.
-	 * @return Array with orders
+	 * @return array An array with orders
 	 */
 	public function internet_get_orders($relation_id)
 	{
@@ -349,10 +349,10 @@ class MultiPressPHP {
 	/**
 	 * Get planning
 	 * 
- 	 * @param Int $start_time
-	 * @param Int $end_time
-	 * @param Int $department_id The id of the department default: 2 = digital
-	 * @return Array with plinning items
+ 	 * @param int $start_time
+	 * @param int $end_time
+	 * @param int $department_id The id of the department default: 2 = digital
+	 * @return array An array with planning items
 	 * @license Connector (basic)
 	 */
 	public function planning_get_lines($start_time = null, $end_time = null, $department_id = 2)
@@ -380,8 +380,8 @@ class MultiPressPHP {
 	/**
 	 * Get planning item details
 	 * 
- 	 * @param Int $id The id of the planning item
-	 * @return Array with planning item details
+ 	 * @param int $id The id of the planning item
+	 * @return array An array with planning item details
 	 * @license Connector (basic)
 	 */
 	public function planning_get_details($id)
@@ -406,7 +406,7 @@ class MultiPressPHP {
 	/**
 	 * Get employee list
 	 * 
-	 * @return Array with employees
+	 * @return array An array with employees
 	 * @license Connector (basic)
 	 */
 	public function employee_list()
@@ -431,8 +431,8 @@ class MultiPressPHP {
 	/**
 	 * Get employee details
 	 * 
- 	 * @param Int $id The id of the employee
-	 * @return Array with details for the employee
+ 	 * @param int $id The id of the employee
+	 * @return array An array with details for the employee
 	 * @license Connector (basic)
 	 */
 	public function employee_details($id)
@@ -457,8 +457,8 @@ class MultiPressPHP {
 	/**
 	 * Get employee operations
 	 * 
- 	 * @param Int $id The id of the employee
-	 * @return Array with operations linked to the employee
+ 	 * @param int $id The id of the employee
+	 * @return array An array with operations linked to the employee
 	 * @license Connector (basic)
 	 */
 	public function employee_operations($id)
@@ -483,9 +483,9 @@ class MultiPressPHP {
 	/**
 	 * Get employee worksheets
 	 * 
- 	 * @param Int $id The id of the employee
- 	 * @param Int $date The date in seconds
-	 * @return Array with operations linked to the employee
+ 	 * @param int $id The id of the employee
+ 	 * @param int $date The date in seconds
+	 * @return array An array with operations linked to the employee
 	 * @license Connector (basic)
 	 */
 	public function employee_worksheets($id, $date = null)
@@ -512,8 +512,8 @@ class MultiPressPHP {
 	/**
 	 * Get job details
 	 * 
- 	 * @param Int $id The id of the job
-	 * @return Array with job details
+ 	 * @param int $id The id of the job
+	 * @return array AN array with job details
 	 * @license Connector (basic)
 	 */
 	public function job_details($id)
@@ -539,8 +539,8 @@ class MultiPressPHP {
 	/**
 	 * Get job order history
 	 * 
- 	 * @param Int $id The id of the job
-	 * @return Array with order history
+ 	 * @param int $id The id of the job
+	 * @return array An array with order history
 	 * @license Connector (basic)
 	 */
 	public function job_order_history($id)
@@ -567,11 +567,10 @@ class MultiPressPHP {
 
 	
 	/**
-	 * get_relation_list
-	 *
 	 * Get a list of relations
+	 *
 	 * @param int $relation_code Relation code: K = Client, L = Supplier, O = Old client, As defined in pulldownlist number 22.
-	 * @return Array with relations
+	 * @return array An array with relations
 	 */
 	public function relation_list($relation_code = 'K')
 	{
@@ -598,8 +597,8 @@ class MultiPressPHP {
 	 *
 	 * Get a list of relations
 	 * @param int $relation_number Relation number
-	 * @param String $details - valid options: brief, full, contact, delivery, financial, pricelist, products, partnership
-	 * @return Array with relations
+	 * @param string $details - valid options: brief, full, contact, delivery, financial, pricelist, products, partnership
+	 * @return array An array with relations
 	 */
 	public function relation_details($relation_number, $details = 'brief')
 	{
@@ -622,10 +621,9 @@ class MultiPressPHP {
 	}
 
    	/**
-	 * get_autoFillAttributes
-	 *
 	 * Get the autofill attributes
-	 * @return Array with autoFillAttributes
+	 *
+	 * @return array An array with autoFillAttributes
 	 */
 	public function get_auto_fill_attributes()
 	{
@@ -651,7 +649,7 @@ class MultiPressPHP {
 	 * get_product_type
 	 *
 	 * Get product types
-	 * @return Array with product types
+	 * @return array An array with product types
 	 */
 	public function get_product_types()
 	{
@@ -676,7 +674,7 @@ class MultiPressPHP {
 	/**
 	 * Get paper
 	 * 
-	 * @return Array list of alle paper
+	 * @return array An array list of all paper
 	 * @license Connector (basic)
 	 */
 	public function get_paper($pdfLink = null)
@@ -731,8 +729,8 @@ class MultiPressPHP {
 	/**
 	 * Get paper by id
 	 * 
-	 * @param Int $id The id of the paper
-	 * @return Array attributes of the paper
+	 * @param int $id The id of the paper
+	 * @return array An array attributes of the paper
 	 * @license Connector (basic)
 	 */
 	public function get_paper_by_id($id)
@@ -745,7 +743,7 @@ class MultiPressPHP {
 	 * get_operations_list
 	 *
 	 * Get operations
-	 * @return Array with operations types
+	 * @return array An array with operations types
 	 */
 	public function get_operations_list()
 	{
@@ -770,8 +768,8 @@ class MultiPressPHP {
 	/**
 	 * Convert date to multipress date
 	 * 
-	 * @param Int time in seconds
-	 * @return String date
+	 * @param int time in seconds
+	 * @return string date
 	 */
 	public static function convertToDate($time)
 	{
@@ -781,8 +779,8 @@ class MultiPressPHP {
 	/**
 	 * Convert decimal time to seconds
 	 * 
-	 * @param Int $time decimal time
-	 * @return Int Seconds
+	 * @param int $time decimal time
+	 * @return int Seconds
 	 */
 	public static function convertToTime($time)
 	{
