@@ -119,7 +119,7 @@ class MultiPressPHP {
 	 * @param string $url Address of the MP server.
 	 * @param int $port Portnumber.
 	 * @param bool $ssl Ssl encryption on or off.
-	 * @return True if successful
+	 * @return bool True if successful
 	 */
 	public function __construct($user,$password,$url,$port,$ssl=false)
 	{
@@ -162,7 +162,7 @@ class MultiPressPHP {
 	 *
 	 * Add data to internet buffer.
 	 * @param array $job_details Details of job like defined in $INT_BUFFER.
-	 * @return True if successful
+	 * @return bool True if successful
 	 */
 	public function fill_internet_buffer($job_details)
 	{
