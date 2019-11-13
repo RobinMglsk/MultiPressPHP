@@ -2,7 +2,7 @@
 
 use RobinMglsk\MultiPressPHP;
 
-require_once('../../src/MultiPressPHP/MultiPressPHP.php');
+require_once('../../vendor/autoload.php');
 $secrets = (include '../secret.php');
 
 $departments = [0 => 'prepress', 1 => 'offset', 2 => 'digitaal', 3 => 'afwerking', 4 => 'werkderden'];

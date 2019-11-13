@@ -2,7 +2,7 @@
 
 use RobinMglsk\MultiPressPHP;
 
-require_once('../../src/MultiPressPHP/MultiPressPHP.php');
+require_once('../../vendor/autoload.php');
 $secrets = (include '../secret.php');
 
 

@@ -2,7 +2,7 @@
 
 use RobinMglsk\MultiPressPHP;
 
-require_once('../../src/MultiPressPHP/MultiPressPHP.php');
+require_once('../../vendor/autoload.php');
 $secrets = (include '../secret.php');
 
 $mp = new MultiPressPHP($secrets['user'], $secrets['password'], $secrets['host'], $secrets['port'], false);

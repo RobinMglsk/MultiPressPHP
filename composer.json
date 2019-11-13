@@ -14,8 +14,8 @@
         "php": ">=7.0"
     },
     "autoload": {
-        "psr-0": {
-            "RobinMglsk": "src/"
+        "psr-4": {
+            "RobinMglsk\\": "src/"
         }
     }
 }
