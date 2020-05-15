@@ -14,7 +14,8 @@ use Exceptions;
  * @link http://www.egberghs.be
  * @version 1.0.0
  */
-class MultiPressPHP {
+class MultiPressPHP
+{
 
 	protected $url = null;
 	protected $port = null;
@@ -66,7 +67,7 @@ class MultiPressPHP {
 		'extra_address_5' => "",
 		'delivery_date' => "2016-01-08T00:00:00Z",
 		'artwork_date' => "2016-01-08T00:00:00Z",
-		'vat' => "6%",
+		'vat' => "21%",
 		'price' => "0",
 		'language_code' => "nl",
 		'invoice_number' => null,
@@ -92,22 +93,7 @@ class MultiPressPHP {
 			"email" => ""
 		],
 		'reference' => "",
-		'autofill' => [
-		  	'pdflink' =>  2,
-			'modelheight' => 297,
-			'modelwidth' => 210,
-			'pagesbody' => 8, //Pages total not body!
-			'pagescover' => 4,
-			'paperbody' => "condat silk wit 130 g/m²",
-			'papercover' => "condat silk wit 300 g/m²",
-			'colorbody' => "Recto: Cyaan; Magenta; Geel; Zwart\rVerso: Cyaan; Magenta; Geel; Zwart\r",
-			'colorcover' => "Recto: Cyaan; Magenta; Geel; Zwart\rVerso: Cyaan; Magenta; Geel; Zwart\r",
-			'bleed' => 3,
-			'grain' => "",
-			'production' => "Printen",
-			'bindingtype' => "",
-			'finishing' => ""
-		]
+		'autofill' => []
 	];
 
 	/**
@@ -121,43 +107,43 @@ class MultiPressPHP {
 	 * @param bool $ssl Ssl encryption on or off.
 	 * @return bool True if successful
 	 */
-	public function __construct($user,$password,$url,$port,$ssl=false)
+	public function __construct($user, $password, $url, $port, $ssl = false)
 	{
-       	$this->url = $url;
-       	$this->port = $port;
+		$this->url = $url;
+		$this->port = $port;
 
-       	if($ssl){
-       		$this->protocol = "https://";
-       	}else{
-       		$this->protocol = "http://";
-       	}
+		if ($ssl) {
+			$this->protocol = "https://";
+		} else {
+			$this->protocol = "http://";
+		}
 
-       	//Headers
-       	$this->headers = array(
-		  "authorization: Basic ".base64_encode($user.":".$password),
-		  "cache-control: no-cache"
+		//Headers
+		$this->headers = array(
+			"authorization: Basic " . base64_encode($user . ":" . $password),
+			"cache-control: no-cache"
 		);
 
-       	//Test connaction
-       	$curl = curl_init();
+		//Test connaction
+		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/system/getInfo");
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_CUSTOMREQUEST,"GET");
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/system/getInfo");
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['program'])){
+		if (isset($r['program'])) {
 			$this->system_info = $r;
 			return true;
-		}else{
+		} else {
 			throw new \Exception('Can not connect to Multipress server.');
 		}
-   	}
+	}
 
-   	/**
+	/**
 	 * fill_internet_buffer
 	 *
 	 * Add data to internet buffer.
@@ -166,160 +152,125 @@ class MultiPressPHP {
 	 */
 	public function fill_internet_buffer($job_details)
 	{
-   		foreach ($job_details as $key => $value) {
-   			if(array_key_exists($key, $this->INT_BUFFER)){
+		foreach ($job_details as $key => $value) {
+			if (array_key_exists($key, $this->INT_BUFFER)) {
 
-   				//DATE
-   				if( $key == "delivery_date" || $key == "artwork_date" ){
-   					$value = self::convertToDate(strtotime($value));
-   				}
+				//DATE
+				if ($key == "delivery_date" || $key == "artwork_date") {
+					$value = self::convertToDate(strtotime($value));
+				}
 
-   				//AUTOFILL
-   				if( $key == "autofill" ){
+				$this->INT_BUFFER[$key] = $value;
+			} else {
 
-   					if(is_array($value)){
+				throw new \Exception($key . ' is not a valid job-option');
+			}
+		}
 
-   						foreach ($value as $k1 => $v1) {
-
-   							if(isset($this->INT_BUFFER[$key][$k1])){
-
-   								$this->INT_BUFFER[$key][$k1] = $v1;
-
-   							}else{
-
-								throw new \Exception($k1.' is not a valid autofill-option');
-
-   							}
-
-   						}
-
-   						break;
-
-   					}else{
-
-   						throw new \Exception($key.' has to be an array');
-
-   					}
-
-   				}
-
-	   			$this->INT_BUFFER[$key] = $value;
-
-   			}else{
-
-				throw new \Exception($key.' is not a valid job-option');
-
-   			}
-
-   		}
-
-   		return true;
-   	}
+		return true;
+	}
 
 
-   	/**
+	/**
 	 * internet_order_add
 	 *
 	 * Write internet buffer to Multipress as an order.
 	 * @return bool True if successful
 	 */
-	   public function internet_order_add()
-	   {
+	public function internet_order_add()
+	{
 
-   		$fields = array(
-		  'data' => json_encode($this->INT_BUFFER,JSON_UNESCAPED_UNICODE),
-		  'id' => urlencode(0)
+		$fields = array(
+			'data' => json_encode($this->INT_BUFFER, JSON_UNESCAPED_UNICODE),
+			'id' => urlencode(0)
 		);
 
-   		$curl = curl_init();
+		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/internet/handleBufferLine");
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_CUSTOMREQUEST,"PUT");
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
-		curl_setopt($curl,CURLOPT_POSTFIELDS,http_build_query($fields));
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/internet/handleBufferLine");
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($fields));
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $this->last_internet_id = $r['id'];
 		}
+	}
 
-   	}
-
-   	/**
+	/**
 	 * internet_order_update
 	 *
 	 * Update order in internet buffer.
 	 * @param int $id Id of order in webbuffer.
 	 * @return bool True if successful
 	 */
-	   public function internet_order_update($id)
-	   {
+	public function internet_order_update($id)
+	{
 
-   		$fields = array(
-		  'data' => json_encode($this->INT_BUFFER,JSON_UNESCAPED_UNICODE),
-		  'id' => urlencode($id)
+		$fields = array(
+			'data' => json_encode($this->INT_BUFFER, JSON_UNESCAPED_UNICODE),
+			'id' => urlencode($id)
 		);
 
-   		$curl = curl_init();
+		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/internet/handleBufferLine");
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_CUSTOMREQUEST,"POST");
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
-		curl_setopt($curl,CURLOPT_POSTFIELDS,http_build_query($fields));
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/internet/handleBufferLine");
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($fields));
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $this->last_internet_id = $r['id'];
 		}
+	}
 
-   	}
-
-   	/**
+	/**
 	 * internet_order_remove
 	 *
 	 * Delete order line from the internet buffer in multipress.
 	 * @param int $id Id of order in webbuffer.
 	 * @return bool True if successful
 	 */
-	   public function internet_order_remove($id)
-	   {
+	public function internet_order_remove($id)
+	{
 
 
-   		$fields = array(
-		  'id' => urlencode($id)
+		$fields = array(
+			'id' => urlencode($id)
 		);
 
-   		$curl = curl_init();
+		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/internet/handleBufferLine?id=".urlencode($id));
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_CUSTOMREQUEST,"DELETE");
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
-		curl_setopt($curl,CURLOPT_POSTFIELDS,http_build_query($fields));
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/internet/handleBufferLine?id=" . urlencode($id));
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($fields));
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			$this->last_internet_id = $r['id'];
 			return true;
 		}
+	}
 
-   	}
-
-   	/**
+	/**
 	 * internet_get_orders
 	 *
 	 * Get order from relation
@@ -329,27 +280,26 @@ class MultiPressPHP {
 	public function internet_get_orders($relation_id)
 	{
 
-   		$curl = curl_init();
+		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/internet/getBufferLines?relation_number=".urlencode($relation_id));
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/internet/getBufferLines?relation_number=" . urlencode($relation_id));
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r;
 		}
-
 	}
-	   
+
 	/**
 	 * Get planning
 	 * 
- 	 * @param int $start_time
+	 * @param int $start_time
 	 * @param int $end_time
 	 * @param int $department_id The id of the department default: 2 = digital
 	 * @return array An array with planning items
@@ -358,21 +308,21 @@ class MultiPressPHP {
 	public function planning_get_lines($start_time = null, $end_time = null, $department_id = 2)
 	{
 
-		$start_time = $start_time === null ? self::convertToDate( strtotime('today') ) : self::convertToDate($start_time);
-		$end_time = $end_time === null ? self::convertToDate( strtotime('tommorow') ) : self::convertToDate($end_time);
+		$start_time = $start_time === null ? self::convertToDate(strtotime('today')) : self::convertToDate($start_time);
+		$end_time = $end_time === null ? self::convertToDate(strtotime('tommorow')) : self::convertToDate($end_time);
 
 		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/planning/getLines?startdate=".$start_time."&stopdate=".$end_time."&department=".$department_id);
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/planning/getLines?startdate=" . $start_time . "&stopdate=" . $end_time . "&department=" . $department_id);
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r;
 		}
 	}
@@ -380,7 +330,7 @@ class MultiPressPHP {
 	/**
 	 * Get planning item details
 	 * 
- 	 * @param int $id The id of the planning item
+	 * @param int $id The id of the planning item
 	 * @return array An array with planning item details
 	 * @license Connector (basic)
 	 */
@@ -389,16 +339,16 @@ class MultiPressPHP {
 
 		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/planning/getLines?id=".$id);
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/planning/getLines?id=" . $id);
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r;
 		}
 	}
@@ -414,16 +364,16 @@ class MultiPressPHP {
 
 		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/employees/getEmployeesList");
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/employees/getEmployeesList");
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r['employees'];
 		}
 	}
@@ -431,7 +381,7 @@ class MultiPressPHP {
 	/**
 	 * Get employee details
 	 * 
- 	 * @param int $id The id of the employee
+	 * @param int $id The id of the employee
 	 * @return array An array with details for the employee
 	 * @license Connector (basic)
 	 */
@@ -440,16 +390,16 @@ class MultiPressPHP {
 
 		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/employees/getEmployeeInfo?employee_number=".$id);
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/employees/getEmployeeInfo?employee_number=" . $id);
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r;
 		}
 	}
@@ -457,7 +407,7 @@ class MultiPressPHP {
 	/**
 	 * Get employee operations
 	 * 
- 	 * @param int $id The id of the employee
+	 * @param int $id The id of the employee
 	 * @return array An array with operations linked to the employee
 	 * @license Connector (basic)
 	 */
@@ -466,16 +416,16 @@ class MultiPressPHP {
 
 		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/employees/handleOperations?employee_number=".$id);
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/employees/handleOperations?employee_number=" . $id);
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r['operations'];
 		}
 	}
@@ -483,28 +433,28 @@ class MultiPressPHP {
 	/**
 	 * Get employee worksheets
 	 * 
- 	 * @param int $id The id of the employee
- 	 * @param int $date The date in seconds
+	 * @param int $id The id of the employee
+	 * @param int $date The date in seconds
 	 * @return array An array with operations linked to the employee
 	 * @license Connector (basic)
 	 */
 	public function employee_worksheets($id, $date = null)
 	{
 
-		$date = $date === null ? self::convertToDate( strtotime('today') ) : self::convertToDate($date);
+		$date = $date === null ? self::convertToDate(strtotime('today')) : self::convertToDate($date);
 
 		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/employees/handleWorkSheets?employee_number=".$id."&date=".$date);
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/employees/handleWorkSheets?employee_number=" . $id . "&date=" . $date);
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r;
 		}
 	}
@@ -512,7 +462,7 @@ class MultiPressPHP {
 	/**
 	 * Get job details
 	 * 
- 	 * @param int $id The id of the job
+	 * @param int $id The id of the job
 	 * @return array AN array with job details
 	 * @license Connector (basic)
 	 */
@@ -522,16 +472,16 @@ class MultiPressPHP {
 
 		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/jobs/getPostCalculation?job_number=".$id);
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/jobs/getPostCalculation?job_number=" . $id);
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r;
 		}
 	}
@@ -539,7 +489,7 @@ class MultiPressPHP {
 	/**
 	 * Get job order history
 	 * 
- 	 * @param int $id The id of the job
+	 * @param int $id The id of the job
 	 * @return array An array with order history
 	 * @license Connector (basic)
 	 */
@@ -548,24 +498,23 @@ class MultiPressPHP {
 		$history = [];
 
 		$details = $this->job_details($id);
-		$historyRaw = explode("\r",$details['job_status_history']);
+		$historyRaw = explode("\r", $details['job_status_history']);
 
-		foreach($historyRaw as $item){
+		foreach ($historyRaw as $item) {
 
-			
+
 
 			array_push($history, [
-				'time' => strtotime(str_replace('/','-',substr($item,0,16))),
-				'msg' => trim(explode("    ",substr($item,16))[0],' :'),
-				'by' => trim(end(explode("    ",substr($item,16))),' :'),
+				'time' => strtotime(str_replace('/', '-', substr($item, 0, 16))),
+				'msg' => trim(explode("    ", substr($item, 16))[0], ' :'),
+				'by' => trim(end(explode("    ", substr($item, 16))), ' :'),
 			]);
-			
 		}
 
 		return $history;
 	}
 
-	
+
 	/**
 	 * Get a list of relations
 	 *
@@ -577,19 +526,18 @@ class MultiPressPHP {
 
 		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/relations/getRelationsList?relation_code=".$relation_code);
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/relations/getRelationsList?relation_code=" . $relation_code);
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r['relations'];
 		}
-
 	}
 
 	/**
@@ -605,44 +553,46 @@ class MultiPressPHP {
 
 		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/relations/getRelationInfo?relation_number=".$relation_number."&details=".$details);
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/relations/getRelationInfo?relation_number=" . $relation_number . "&details=" . $details);
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r;
 		}
-
 	}
 
-   	/**
+	/**
 	 * Get the autofill attributes
 	 *
 	 * @return array An array with autoFillAttributes
 	 */
-	public function get_auto_fill_attributes()
+	public function get_auto_fill_attributes($id = null)
 	{
 
 		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/internet/autoFillAttributes");
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		$query_params = '';
+		$query_params .= $id !== null ? 'id=' . $id . '&' : '';
+		$query_params = trim($query_params, '&');
 
-		$r = json_decode(curl_exec($curl),true);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/internet/autoFillAttributes?" . $query_params);
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		if(isset($r['errornumber'])){
+		$r = json_decode(curl_exec($curl), true);
+
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r;
 		}
-
 	}
 
 	/**
@@ -656,19 +606,18 @@ class MultiPressPHP {
 
 		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/system/getProductTypes");
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/system/getProductTypes");
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r['product_types'];
 		}
-
 	}
 
 	/**
@@ -680,50 +629,50 @@ class MultiPressPHP {
 	public function get_paper($pdfLink = null)
 	{
 		$paperList = [];
-		$autoFillAttributes = $this->get_auto_fill_attributes();
 
-		if($pdfLink === null){
-			foreach($autoFillAttributes as $type){
-				foreach($type['paper'] as $paper){
-					if(!array_key_exists($paper['id'], $paperList)){
-						$paperList[$paper['id']] = [
-							'name' => $paper['name'],
-							'description' => $paper['description'],
-							'roll' => $paper['roll'],
-							'width' => $paper['width'],
-							'length' => $paper['length'],
-							'type' => $paper['type'],
-							'weight' => $paper['weight']
-						];
+
+		if ($pdfLink === null) {
+			$pdfLinks = $this->get_auto_fill_attributes();
+
+			foreach ($pdfLinks as $type) {
+
+				$autoFillAttributes = $this->get_auto_fill_attributes($type['id']);
+
+				foreach ($autoFillAttributes['productionlines'] as $productionline) {
+
+					$materials = [];
+					if (isset($productionline['digital']['materials'])) $materials = $productionline['digital']['materials'];
+					if (isset($productionline['offset']['materials'])) $materials = $productionline['digioffsettal']['materials'];
+					if (isset($productionline['largeformat']['materials'])) $materials = $productionline['largeformat']['materials'];
+
+					foreach ($materials as $material) {
+						if (!in_array($material, $paperList)) {
+							array_push($paperList, $material);
+						}
 					}
 				}
 			}
-		}else{
+		} else {
 
-			$selectedType = null;
-			foreach($autoFillAttributes as $type){
-				if($type['id'] == $pdfLink) $selectedType =$type;
-			}
+			$autoFillAttributes = $this->get_auto_fill_attributes($pdfLink);
 
-			if(is_null($selectedType)) throw new \Exception('PdfLink not found');
+			if (!isset($autoFillAttributes['id'])) throw new \Exception('PdfLink not found');
 
-			foreach($selectedType['paper'] as $paper){
-				if(!array_key_exists($paper['id'], $paperList)){
-					$paperList[$paper['id']] = [
-						'name' => $paper['name'],
-						'description' => $paper['description'],
-						'roll' => $paper['roll'],
-						'width' => $paper['width'],
-						'length' => $paper['length'],
-						'type' => $paper['type'],
-						'weight' => $paper['weight']
-					];
+			foreach ($autoFillAttributes['productionlines'] as $productionline) {
+
+				$materials = [];
+				if (isset($productionline['digital']['materials'])) $materials = $productionline['digital']['materials'];
+				if (isset($productionline['offset']['materials'])) $materials = $productionline['digioffsettal']['materials'];
+				if (isset($productionline['largeformat']['materials'])) $materials = $productionline['largeformat']['materials'];
+
+				foreach ($materials as $material) {
+					if (!in_array($material, $paperList)) {
+						array_push($paperList, $material);
+					}
 				}
 			}
 		}
-
 		return $paperList;
-
 	}
 
 	/**
@@ -750,19 +699,18 @@ class MultiPressPHP {
 
 		$curl = curl_init();
 
-		curl_setopt($curl,CURLOPT_URL,$this->protocol.$this->url.":".$this->port."/connector/employees/getOperationsList");
-		curl_setopt($curl,CURLOPT_PORT,$this->port);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-		curl_setopt($curl,CURLOPT_HTTPHEADER,$this->headers);
+		curl_setopt($curl, CURLOPT_URL, $this->protocol . $this->url . ":" . $this->port . "/connector/employees/getOperationsList");
+		curl_setopt($curl, CURLOPT_PORT, $this->port);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $this->headers);
 
-		$r = json_decode(curl_exec($curl),true);
+		$r = json_decode(curl_exec($curl), true);
 
-		if(isset($r['errornumber'])){
+		if (isset($r['errornumber'])) {
 			throw new \Exception("Error:" . $r['errornumber'] . " - " . @$r['errortext']);
-		}else{
+		} else {
 			return $r['operations'];
 		}
-
 	}
 
 	/**
@@ -784,8 +732,6 @@ class MultiPressPHP {
 	 */
 	public static function convertToTime($time)
 	{
-		return (60*$time)*60;
+		return (60 * $time) * 60;
 	}
 }
-
-?>
